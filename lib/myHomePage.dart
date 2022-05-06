@@ -126,6 +126,29 @@ showDialogox(context);
 
 
       ),
+      actions: [
+        ElevatedButton(
+            onPressed: (){
+              nameinput.clear();
+              titleinput.clear();
+              descinput.clear();
+              Navigator.pop(context);
+            },
+            child: Text("Cancel")
+        )
+,
+        ElevatedButton(
+            onPressed: (){
+              nameinput.clear();
+              titleinput.clear();
+              descinput.clear();
+              Navigator.pop(context);
+            },
+            child: Text("Save")
+        )
+      ],
+
+
     ),
 
 
