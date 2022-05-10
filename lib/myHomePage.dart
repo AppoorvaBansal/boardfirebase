@@ -33,7 +33,7 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton(
 
         onPressed: (){
-showDialogox(context);
+              showDialogox(context);
         },
         child: Icon(Icons.edit),
       ),
@@ -52,7 +52,7 @@ showDialogox(context);
                 itemCount: snapshot.data.documents.length,
                 itemBuilder: (context,int index){
 
-                  return Text(snapshot.data.documents[index]['Description']);
+                  return Text(snapshot.data.documents[index]['Title']);
 
                 }
 
@@ -139,10 +139,21 @@ showDialogox(context);
 ,
         ElevatedButton(
             onPressed: (){
-              nameinput.clear();
-              titleinput.clear();
-              descinput.clear();
-              Navigator.pop(context);
+              if(nameinput.text.isNotEmpty && titleinput.text.isNotEmpty&& descinput.text.isNotEmpty){
+                  FirebaseFirestore.instance.collection("Borad").add(
+                    {
+                      "name":nameinput.text,
+                      "Description":descinput.text,
+                      "Title":titleinput.text,
+                      "timestamp":new DateTime.now()
+                    }
+
+                  ).then((response) => print(response.documentID));
+                  Navigator.pop(context);
+                  nameinput.clear();
+                  titleinput.clear();
+                  descinput.clear();
+              }
             },
             child: Text("Save")
         )
