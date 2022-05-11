@@ -1,5 +1,6 @@
 import'package:flutter/material.dart';
 import'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
 
@@ -49,10 +50,10 @@ class _MyHomePageState extends State<MyHomePage> {
           else{
 
             return ListView.builder(
-                itemCount: snapshot.data.documents.length,
+                itemCount: snapshot.data?.documents.length,
                 itemBuilder: (context,int index){
 
-                  return Text(snapshot.data.documents[index]['Title']);
+                  return CustomCard(snapshot:snapshot.data,index:index);
 
                 }
 
@@ -139,8 +140,9 @@ class _MyHomePageState extends State<MyHomePage> {
 ,
         ElevatedButton(
             onPressed: (){
-              if(nameinput.text.isNotEmpty && titleinput.text.isNotEmpty&& descinput.text.isNotEmpty){
-                  FirebaseFirestore.instance.collection("Borad").add(
+              if(nameinput.text.isNotEmpty && titleinput.text.isNotEmpty && descinput.text.isNotEmpty){
+                  FirebaseFirestore.instance.collection("Board")
+                      .add(
                     {
                       "name":nameinput.text,
                       "Description":descinput.text,
@@ -149,6 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     }
 
                   ).then((response) => print(response.documentID));
+                  //snackbar "ADD SUCCESSFULLY"
                   Navigator.pop(context);
                   nameinput.clear();
                   titleinput.clear();
@@ -167,3 +170,56 @@ class _MyHomePageState extends State<MyHomePage> {
 
   }
 }
+
+class CustomCard extends StatelessWidget {
+  final int index;
+  final QuerySnapshot snapshot;
+  const CustomCard({Key? key,required this.snapshot,required this.index}) : super(key: key);
+
+
+  @override
+  Widget build(BuildContext context) {
+
+    //var timetoDate=new DateTime.now();
+     var td=DateTime.fromMillisecondsSinceEpoch(snapshot.docs[index]["timestamp"].seconds*1000);
+    var dateformat=new DateFormat("EEEE,MMM,d,y").format(td);
+
+    return 
+      
+      Container(
+      height: 120,
+        child: Card(
+          elevation: 10,
+          child: Column(
+          children: [
+
+                 ListTile(
+                  title: Text(snapshot.docs[index]["Title"]),
+                  subtitle: Text(snapshot.docs[index]["Description"]),
+                  leading: CircleAvatar(
+                    radius: 35,
+                      child: Text(snapshot.docs[index]["Title"].toString()[0].toUpperCase()),
+
+                  ),
+                ),
+
+                Row(
+
+                  children: [
+                    Text("BY: ${snapshot.docs[index]["name"]}  "),
+                    Text(dateformat),
+                  ],
+                )
+              //Text((snapshot.docs[index]["timestamp"]==null)?"NA":snapshot.docs[index]["timestamp"].toString())
+
+          ],
+
+
+
+
+    ),
+        ),
+      );
+  }
+}
+
