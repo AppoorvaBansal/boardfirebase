@@ -140,24 +140,28 @@ class _MyHomePageState extends State<MyHomePage> {
 ,
         ElevatedButton(
             onPressed: (){
-              if(nameinput.text.isNotEmpty && titleinput.text.isNotEmpty && descinput.text.isNotEmpty){
-                  FirebaseFirestore.instance.collection("Board")
-                      .add(
-                    {
-                      "name":nameinput.text,
-                      "Description":descinput.text,
-                      "Title":titleinput.text,
-                      "timestamp":new DateTime.now()
-                    }
+  if(nameinput.text.isNotEmpty && titleinput.text.isNotEmpty && descinput.text.isNotEmpty){
+  FirebaseFirestore.instance.collection("Board")
+      .add(
+  {
+  "name":nameinput.text,
+  "Description":descinput.text,
+  "Title":titleinput.text,
+  "timestamp":new DateTime.now()
+  }
 
-                  ).then((response) => print(response.documentID));
-                  //snackbar "ADD SUCCESSFULLY"
-                  Navigator.pop(context);
-                  nameinput.clear();
-                  titleinput.clear();
-                  descinput.clear();
-              }
-            },
+  ).then((response){
+
+  print(response.documentID);
+  //snackbar "ADD SUCCESSFULLY"
+  var docid=response.documentID;
+  Navigator.pop(context);
+  nameinput.clear();
+  titleinput.clear();
+  descinput.clear();
+  }).catchError((error)=>print(error));
+  }
+  },
             child: Text("Save")
         )
       ],
@@ -177,20 +181,29 @@ class CustomCard extends StatelessWidget {
   const CustomCard({Key? key,required this.snapshot,required this.index}) : super(key: key);
 
 
+
   @override
   Widget build(BuildContext context) {
+
+
 
     //var timetoDate=new DateTime.now();\\
 
     //var time=DateTime.fromMillisecondsSinceEpoch(snapshot.docs[index]["timestamp"].second*1000);
 
+    var docId=snapshot.docs[index].documentID;
      var td=DateTime.fromMillisecondsSinceEpoch(snapshot.docs[index]["timestamp"].seconds*1000);
     var dateformat=new DateFormat("EEEE,MMM,d,y").format(td);
+
+
+    late TextEditingController nameinput=new TextEditingController(text:snapshot.docs[index]["name"]);
+    late TextEditingController titleinput=new TextEditingController(text:snapshot.docs[index]["Title"]);
+    late TextEditingController descinput=new TextEditingController(text:snapshot.docs[index]["Description"]);
 
     return 
       
       Container(
-      height: 120,
+      height: 170,
         child: Card(
           elevation: 10,
           child: Column(
@@ -206,13 +219,164 @@ class CustomCard extends StatelessWidget {
                   ),
                 ),
 
-                Row(
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text("BY: ${snapshot.docs[index]["name"]}  "),
+                      Text(dateformat),
+                    ],
+                  ),
+                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  IconButton(
+                      onPressed:() async{
+                        await showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                          contentPadding:EdgeInsets.all(10) ,
+                          content:Column(
+                            children: [
+                              Text("UPADTE THE CURRENT RECORD"),
+                              Expanded(
+                                  child: TextField(
+                                    autofocus: true,
+                                    autocorrect: true,
+                                    decoration: InputDecoration(
+                                        labelText: "Your Name"
 
-                  children: [
-                    Text("BY: ${snapshot.docs[index]["name"]}  "),
-                    Text(dateformat),
-                  ],
-                )
+                                    ),
+                                    controller: nameinput,  // variable
+
+                                  )
+
+                              ),
+
+                              Expanded(
+                                  child: TextField(
+                                    autofocus: true,
+                                    autocorrect: true,
+                                    decoration: InputDecoration(
+                                        labelText: "Title"
+
+                                    ),
+                                    controller: titleinput,
+
+                                  )
+
+                              ),
+
+                              Expanded(
+                                  child: TextField(
+                                    autofocus: true,
+                                    autocorrect: true,
+                                    decoration: InputDecoration(
+                                        labelText: "Description: "
+
+                                    ),
+                                    controller: descinput,
+
+                                  )
+
+                              )
+
+
+                            ],
+
+
+                          ),
+                          actions: [
+                            ElevatedButton(
+                                onPressed: (){
+                                  nameinput.clear();
+                                  titleinput.clear();
+                                  descinput.clear();
+                                  Navigator.pop(context);
+                                },
+                                child: Text("Cancel")
+                            )
+                            ,
+                            ElevatedButton(
+                                onPressed: () {
+                                  if(nameinput.text.isNotEmpty && titleinput.text.isNotEmpty && descinput.text.isNotEmpty){
+
+                                    FirebaseFirestore.instance.collection("Board")
+                                        .document(docId).update(
+                                        {
+                                          "name":nameinput.text,
+                                          "Description":descinput.text,
+                                          "Title":titleinput.text,
+                                          "timestamp":new DateTime.now()
+                                        }
+                                    ).then((response){
+                                       //print(response.documentID);
+                                      //snackbar "ADD SUCCESSFULLY"
+                                           // var docid=response.documentID;
+                                              Navigator.pop(context);
+                                              nameinput.clear();
+                                              titleinput.clear();
+                                              descinput.clear();
+                                            }).catchError((error)=>print(error));
+
+                                  //   FirebaseFirestore.instance.collection("Board")
+                                  //       .add(
+                                  //       {
+                                  //         "name":nameinput.text,
+                                  //         "Description":descinput.text,
+                                  //         "Title":titleinput.text,
+                                  //         "timestamp":new DateTime.now()
+                                  //       }
+                                  //
+                                  //   ).then((response){
+                                  //
+                                  //     print(response.documentID);
+                                  //     //snackbar "ADD SUCCESSFULLY"
+                                  //     var docid=response.documentID;
+                                  //     Navigator.pop(context);
+                                  //     nameinput.clear();
+                                  //     titleinput.clear();
+                                  //     descinput.clear();
+                                  //   }).catchError((error)=>print(error));
+                                   }
+                                },
+                                child: Text("UPDATE")
+                            )
+                          ],
+
+
+                        ),
+
+                          );},
+
+
+
+
+
+
+
+
+                      icon: Icon(Icons.edit_location_outlined,size: 20,)
+                  ),
+                  IconButton(
+                      onPressed:() async{
+                        var fbOb=FirebaseFirestore.instance.collection("Board");
+                        await fbOb.doc(docId).delete();
+                        print("ID : $docId");
+
+
+
+                      },
+                      icon: Icon(Icons.delete_outline_outlined,size: 20,)
+                  )
+
+
+                ],
+
+
+              )
               //Text((snapshot.docs[index]["timestamp"]==null)?"NA":snapshot.docs[index]["timestamp"].toString())
 
           ],
