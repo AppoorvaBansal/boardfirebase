@@ -9,7 +9,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var firestoredb=FirebaseFirestore.instance.collection("Board").snapshots();
+  var firestoredb=FirebaseFirestore.instance.collection("Board").snapshots(); // STEP 1
   late TextEditingController nameinput=new TextEditingController();
   late TextEditingController titleinput=new TextEditingController();
   late TextEditingController descinput=new TextEditingController();
@@ -88,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     labelText: "Your Name"
 
                   ),
-                controller: nameinput,
+                controller: nameinput,  // variable
 
               )
 
@@ -180,7 +180,10 @@ class CustomCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    //var timetoDate=new DateTime.now();
+    //var timetoDate=new DateTime.now();\\
+
+    //var time=DateTime.fromMillisecondsSinceEpoch(snapshot.docs[index]["timestamp"].second*1000);
+
      var td=DateTime.fromMillisecondsSinceEpoch(snapshot.docs[index]["timestamp"].seconds*1000);
     var dateformat=new DateFormat("EEEE,MMM,d,y").format(td);
 
